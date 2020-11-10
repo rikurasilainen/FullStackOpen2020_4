@@ -3,7 +3,10 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const helper = require('./test_helper')
+const bcrypt = require('bcrypt')
+const { application } = require('express')
 
 beforeEach(async () => {
     await Blog.deleteMany({})
@@ -147,6 +150,60 @@ describe('altering blogs', () => {
         const blogsAtEnd = await helper.blogsInDb()
         expect(blogsAtEnd[0].likes).toBe(1)
     })
+})
+
+describe('tests with initially one user in db', () => {
+    beforeEach(async () => {
+        await User.deleteMany({})
+        const passwordHash = await bcrypt.hash('sekret', 10)
+        const user = new User({ username: 'root', passwordHash })
+        await user.save()
+    })
+
+    test('creation succeeds with a fresh username', async () => {
+        const startUsers = await helper.usersInDb()
+        const user = {
+            username: 'dudeperson',
+            name: 'persondude',
+            password: 'secret'
+        }
+
+        await api
+            .post('/api/users')
+            .send(user)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+
+        const endUsers = await helper.usersInDb()
+        expect(endUsers).toHaveLength(startUsers.length + 1)
+
+        const usernames = endUsers.map(u => u.username)
+        expect(usernames).toContain(user.username)
+
+    })
+
+    test('creation fails with proper statuscode if username already exists', async () => {
+        const startUsers = await helper.usersInDb()
+
+        const user = {
+            username: 'root',
+            name: 'Superuser',
+            password: 'salainen'
+        }
+
+        const result = await api
+            .post('/api/users')
+            .send(user)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+            expect(result.body.error).toContain('`username` to be unique')
+            
+            const endUsers = await helper.usersInDb()
+            expect(endUsers).toHaveLength(startUsers.length)
+
+    })
+
 })
 
 afterAll(() => {
