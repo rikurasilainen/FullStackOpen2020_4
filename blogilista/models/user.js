@@ -1,11 +1,10 @@
-const { request } = require("express");
 const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 
 const userSchema = mongoose.Schema({
     username: {
         type: String,
-        unique: true
+        unique: true,
     },
     name: String,
     password: String,

@@ -6,7 +6,6 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 const helper = require('./test_helper')
 const bcrypt = require('bcrypt')
-const { application } = require('express')
 
 beforeEach(async () => {
     await Blog.deleteMany({})
@@ -197,13 +196,53 @@ describe('tests with initially one user in db', () => {
             .expect(400)
             .expect('Content-Type', /application\/json/)
 
-            expect(result.body.error).toContain('`username` to be unique')
-            
-            const endUsers = await helper.usersInDb()
-            expect(endUsers).toHaveLength(startUsers.length)
+        expect(result.body.error).toContain('`username` to be unique')
+
+        const endUsers = await helper.usersInDb()
+        expect(endUsers).toHaveLength(startUsers.length)
 
     })
 
+    test('creation fails when password is too short (>3)', async () => {
+        const startUsers = await helper.usersInDb()
+
+        const user = {
+            username: 'unique username',
+            name: 'person name',
+            password: 'pw'
+        }
+
+        const result = await api
+            .post('/api/users')
+            .send(user)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        expect(result.body.error).toContain('Password')
+        const endUsers = await helper.usersInDb()
+        expect(endUsers).toHaveLength(startUsers.length)
+    })
+
+    //gives internal server error?
+    test('creation fails when username is missing or too short', async () => {
+        const startUsers = await helper.usersInDb()
+
+        const user = {
+            username: '',
+            name: 'person name',
+            password: 'validpassword'
+        }
+
+        const result = await api
+            .post('/api/users')
+            .send(user)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        expect(result.body.error).toContain('Username')
+        const endUsers = await helper.usersInDb()
+        expect(endUsers).toHaveLength(startUsers.length)
+    })
 })
 
 afterAll(() => {
