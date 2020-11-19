@@ -223,7 +223,6 @@ describe('tests with initially one user in db', () => {
         expect(endUsers).toHaveLength(startUsers.length)
     })
 
-    //gives internal server error?
     test('creation fails when username is missing or too short', async () => {
         const startUsers = await helper.usersInDb()
 

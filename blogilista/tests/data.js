@@ -7,4 +7,10 @@ const testBlogs = [
     { _id: "5a422bc61b54a676234d17fc", title: "Type wars", author: "Robert C. Martin", url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html", likes: 2, __v: 0 }
 ]
 
-module.exports = { testBlogs }
+const testUsers = [
+    {username: 'username1', name: 'name1', passwordHash: 'password1'},
+    {username: 'username2', name: 'name2', passwordHash: 'password2'},
+    {username: 'username3', name: 'name3', passwordHash: 'password3'}
+]
+
+module.exports = { testBlogs, testUsers }
