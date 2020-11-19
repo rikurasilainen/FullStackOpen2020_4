@@ -17,18 +17,9 @@ blogsRouter.get('/:id', async (request, response) => {
   }
 })
 
-const getTokenFrom = request => {
-  const authorization = request.get('authorization')
-  if (authorization && authorization.toLowerCase().startsWith('bearer')) {
-    return authorization.substring(7)
-  }
-  return null
-}
-
 blogsRouter.post('/', async (request, response) => {
   const body = request.body
-  
-  const token = getTokenFrom(request)
+  const token = request.token
   const decoded = jwt.verify(token, process.env.SECRET)
   if (!token || ! decoded.id) {
     return response.status(401).json({
@@ -47,6 +38,8 @@ blogsRouter.post('/', async (request, response) => {
   })
 
   const savedBlog = await blog.save()
+  savedBlog.populate('user', {username: 1, name: 1, id: 1}).execPopulate()
+
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
 

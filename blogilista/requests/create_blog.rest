@@ -1,10 +1,10 @@
 POST http://localhost:3001/api/blogs
 Content-Type: application/json
-Authorization: bearer
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5ld1VzZXIiLCJpZCI6IjVmYjYyM2Y2MzA4NDhmNGExNGMwZGM0NCIsImlhdCI6MTYwNTc3MjMwM30.2BI3e9BcfWmqI9gEL6Gu2FvbG0uSTxsAKKHmzFKHlbw
 
 {
   "title": "stuff",
   "author": "someone",
   "url": "urlhere",
-  "likes": "5"
+  "likes": "55"
 }
